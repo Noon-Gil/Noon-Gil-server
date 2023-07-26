@@ -7,6 +7,7 @@ require("dotenv").config();
 const router = require("./routes");
 
 const app = express();
+app.use(cors());
 // express 서버의 포트 지정
 app.set("port", process.env.PORT || 3000);
 
