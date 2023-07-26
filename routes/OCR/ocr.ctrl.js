@@ -3,6 +3,7 @@ require('dotenv').config();
 const { promisify } = require('util');
 const fs = require('fs');
 const FormData = require('form-data');
+const { Configuration, OpenAIApi} = require("openai");
 
 const ocr_secret = process.env.X_OCR_SECRET;
 
@@ -46,13 +47,32 @@ exports.ocrConversion = async (req, res) => {
         config
       );
 
-      console.log("RESPONSE: ", response);
-
+      const configuration = new Configuration({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    
+      const openai = new OpenAIApi(configuration);
+       
       if (response.status === 200) {
         console.log('requestWithBase64 response:', response.data);
         const textResult = response.data.images[0].fields.map((field) => field.inferText).join(' ');
-        res.json({ text: textResult });
+        // res.json({ text: textResult });
         console.log(textResult);
+
+        const chatCompletion = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            temperature: 0,
+            messages: [
+                { role: "system", content: "입력된 텍스트가 어떤 내용인지 아주 간단한 설명과 함께 대화체로 읽어주는 시각장애인을 위한 도구" },
+                { role: "user", content: "주민등록증"},
+                { role: "assistant", content: "주민등록증이라고 적혀있네요."},
+                { role: "user", content: "CROWN WHITE 화이트하임"},
+                { role: "assistant", content: "과자가 있어요. CROWN WHITE 화이트하임이라고 적혀있네요."},
+                { role: "user", content: textResult}
+            ]
+        });
+        res.json({ text: chatCompletion.data.choices[0].message.content})
+        console.log(chatCompletion.data.choices[0].message.content);
       }
     };
 
