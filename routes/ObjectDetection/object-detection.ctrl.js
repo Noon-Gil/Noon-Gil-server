@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { Configuration, OpenAIApi} = require("openai");
 var fs = require('fs');
 require("dotenv").config();
 
@@ -6,64 +7,6 @@ const client_id = process.env.X_NCP_APIGW_API_KEY_ID;
 const client_secret = process.env.X_NCP_APIGW_API_KEY;
 
 exports.objectDetection = async (req, res) => {
-  // var api_url = 'https://naveropenapi.apigw.ntruss.com/vision-obj/v1/detect'; // 객체 인식
-
-  // var _formData = {
-  //   image:'image',
-  //   image: fs.createReadStream(req.file.path) // FILE 이름
-  // };
-  // var _req = request.post({url:api_url, formData:_formData,
-  //   headers: {
-  //     'X-NCP-APIGW-API-KEY-ID':client_id,
-  //     'X-NCP-APIGW-API-KEY': client_secret
-  //   }}).on('response', function(response) {
-  //   console.log(response.statusCode) // 200
-  //   console.log(response.headers['content-type'])
-
-  //   // 응답 데이터를 받을 변수를 선언합니다.
-  //   var responseData = '';
-
-  //   // 데이터가 도착할 때마다 읽어서 responseData 변수에 추가합니다.
-  //   response.on('data', function(chunk) {
-  //     responseData += chunk;
-  //   });
-
-  //   // 모든 데이터를 읽었을 때 호출되는 이벤트 핸들러입니다.
-  //   response.on('end', function() {
-  //     // responseData에는 응답 본문의 전체 데이터가 저장되어 있습니다.
-  //     console.log(responseData);
-  //   });
-
-  //   if(responseData["predictions"] === 0){
-  //     res.status(200);
-  //     return res.json({ data: "인식되는 물체가 없네요." })
-  //   }
-
-  //   const processedObjects = [];
-
-  //   // for i in range 와 동일한 역할(감지된 object 개수만큼 반복)
-  //   [...new Array(responseData["predictions"])].forEach((v, index) => {
-  //     const obj = {
-  //       id: responseData["detection_classes"][index],
-  //       name: responseData["detection_names"][index],
-  //       score: responseData["detection_scores"][index],
-  //       position: (() => {
-  //         const area = responseData["detection_boxes"][index];
-  //         const x = (area[0] + area[2]) / 2;
-  //         const y = (area[1] + area[3]) / 2;
-  //         return {x: x, y: y}
-  //       })(),
-  //       size: (() => {
-  //         const area = responseData["detection_boxes"][index];
-  //         const width = Math.abs(area[0] - area[2]);
-  //         const height = Math.abs(area[2] - area[3]);
-  //         return x*y
-  //       })(),
-  //     }
-  //     processedObjects.push(obj);
-  //   });
-  // });
-  
   // 이미지 분석 API 엔드포인트 URL
   const apiUrl = `https://${process.env.AZURE_ENDPOINT}/computervision/imageanalysis:analyze?api-version=2023-02-01-preview&features=caption&language=en`;
   // 이미지 데이터 읽기
@@ -93,8 +36,25 @@ exports.objectDetection = async (req, res) => {
     });
     console.log(JSON.stringify(translationRes.data.message.result.translatedText));
 
+    const configuration = new Configuration({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    const openai = new OpenAIApi(configuration);
+    
+    const chatCompletion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {role: "system", content: "한글로 이미지 캡션을 받아서 \"요\" 자로 끝나는 한 문장의 한글 대화체(존댓말)로 다시 말해주는 번역기"},
+        {role: "user", content: "컴퓨터와 칠판이 있는 방"},
+        {role: "assistant", content: "컴퓨터와 칠판이 있는 방이 보여요"},
+        {role: "user", content: "안경을 쓴 여자"},
+        {role: "assistant", content: "안경을 쓴 여성분이 보여요"},
+        {role: "user", content: `${translationRes.data.message.result.translatedText}`}],
+    });
+    console.log(chatCompletion.data.choices[0].message);
+
     res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' });
-    return res.end(JSON.stringify(translationRes.data.message.result.translatedText));
+    return res.end(JSON.stringify(chatCompletion.data.choices[0].message));
   } catch (error) {
     res.status(error.response.status).end();
     console.log('error = ' + error.response.status);
