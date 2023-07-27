@@ -15,7 +15,7 @@ exports.ttsConversion = async (req, res) => {
       naverTTSEndpoint,
       {
         speaker: 'nara',
-        volume: '0',
+        volume: '5',
         speed: '0',
         pitch: '0',
         text,
