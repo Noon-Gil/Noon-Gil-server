@@ -41,8 +41,8 @@ exports.emotion = (req, res) => {
                 const parsedData = JSON.parse(responseData);
                
                 let result = "";
-                if(parsedData.info.faceCount === 0){
-                    result = "얼굴을 찾지 못했어요"
+                if(parsedData.info.faceCount === 0 || parsedData.faces[0] === null || parsedData.faces[0] === undefined){
+                    result = "얼굴을 찾지 못했어요";
                 } else {
                     const emotionValue = parsedData.faces[0].emotion.value;
                     console.log('Emotion Value:', emotionValue);
@@ -74,9 +74,11 @@ exports.emotion = (req, res) => {
                     const chatCompletion = await openai.createChatCompletion({
                     model: "gpt-3.5-turbo",
                     messages: [
-                        {role: "system", content: "인식한 감정을 자연스러운 대화체로 말해주는 번역기"},
+                        {role: "system", content: "만약 감정을 인식했다면, 인식한 감정을 자연스러운 대화체로 말해주는 번역기"},
                         {role: "user", content: "슬퍼 표정이에요"},
                         {role: "assistant", content: "슬픈 표정을 짓고 있어요"},
+                        {role: "user", content: "얼굴을 찾지 못했어요"},
+                        {role: "assistant", content: "얼굴을 찾지 못했어요. 다시 촬영해주세요"},
                         {role: "user", content: "웃음 표정이에요"},
                         {role: "assistant", content: "웃고 있어요, 행복해보여요"},
                         {role: "user", content: `${result}`}],

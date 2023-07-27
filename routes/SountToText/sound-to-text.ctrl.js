@@ -47,7 +47,7 @@ exports.selection = async (req, res) => {
             const chatCompletion = await openai.createChatCompletion({
               model: "gpt-3.5-turbo",
               messages: [
-                {role: "system", content: "너는 질문의 의도를 넷 중 하나로 분류하는 분류기야. USER는 보이는 장면을 궁금해하거나, 앞에 있는 사람이 어떤 사람을 닮았는지 궁금해하거나, 무엇이 적혀있는지 궁금해하고 있어. 장면을 궁금해할 경우 \"object-detection\", 앞 사람이 누구를 닮았는지 궁금해할 경우 \"face-recognition\" 글자를 궁금해할 경우 \"tts\", 그리고 상대의 기분,표정을 궁금해할 경우 \"emotion\" 이라고 넷 중 하나의 단어로만 답변해야해."},
+                {role: "system", content: "너는 질문의 의도를 넷 중 하나로 분류하는 분류기야. USER는 보이는 장면을 궁금해하거나, 앞에 있는 사람이 어떤 사람을 닮았는지 궁금해하거나, 무엇이 적혀있는지 궁금해하고 있어. 장면을 궁금해할 경우 \"object-detection\", 앞 사람이 누구를 닮았는지 궁금해할 경우 \"face-recognition\" 글자를 궁금해할 경우 \"tts\", 그리고 상대의 기분,표정을 궁금해할 경우 \"emotion\", 반드시 이 넷 중 하나의 단어로만 답변해야해."},
                 {role: "user", content: "뭐가 보여"},
                 {role: "assistant", content: "object-detection"},
                 {role: "user", content: "내 앞에 있는 사람은 누구를 닮았어?"},
@@ -61,7 +61,7 @@ exports.selection = async (req, res) => {
                 {role: "user", content: `${response.data.text}`}],
             });
             console.log(chatCompletion.data.choices[0].message);
-        
+
             res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' });
             return res.end(JSON.stringify(chatCompletion.data.choices[0].message));
           })
