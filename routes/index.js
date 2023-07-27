@@ -2,13 +2,13 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const faceRecognition = require("./FaceRecognition");
 const objectDetection = require("./ObjectDetection");
 const ocr = require("./OCR");
 const soundToText = require("./SountToText");
 const test = require("./test");
 const tts = require("./TTS");
+const emotion = require("./Emotion");
 
 router.get("/", (req, res) => {
   res.locals.title = "Node Chat!";
@@ -21,5 +21,6 @@ router.use("/ocr", ocr);
 router.use("/stt", soundToText);
 router.use("/test", test);
 router.use("/tts", tts);
+router.use("/emotion", emotion);
 
 module.exports = router;
