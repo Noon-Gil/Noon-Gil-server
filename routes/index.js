@@ -2,10 +2,12 @@ const express = require("express");
 
 const router = express.Router();
 
-const test = require("./test");
+
+const faceRecognition = require("./FaceRecognition");
 const objectDetection = require("./ObjectDetection");
-const soundToText = require("./SountToText");
 const ocr = require("./OCR");
+const soundToText = require("./SountToText");
+const test = require("./test");
 const tts = require("./TTS");
 
 router.get("/", (req, res) => {
@@ -13,11 +15,11 @@ router.get("/", (req, res) => {
   res.json("{index}");
 });
 
-router.use("/test", test);
+router.use("/face-recognition", faceRecognition);
 router.use("/object-detection", objectDetection);
-
-router.use("/tts", tts);
-router.use("/stt", soundToText);
 router.use("/ocr", ocr);
+router.use("/stt", soundToText);
+router.use("/test", test);
+router.use("/tts", tts);
 
 module.exports = router;
