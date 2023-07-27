@@ -63,7 +63,7 @@ exports.ocrConversion = async (req, res) => {
             model: "gpt-3.5-turbo",
             temperature: 0,
             messages: [
-                { role: "system", content: "입력된 텍스트가 어떤 내용인지 아주 간단한 설명과 함께 대화체로 읽어주는 시각장애인을 위한 도구" },
+                { role: "system", content: "인식한 텍스트가 어떤 내용인지 아주 간단한 설명과 함께 대화체로 읽어주는 시각장애인을 위한 도구" },
                 { role: "user", content: "주민등록증"},
                 { role: "assistant", content: "주민등록증이라고 적혀있네요."},
                 { role: "user", content: "CROWN WHITE 화이트하임"},
